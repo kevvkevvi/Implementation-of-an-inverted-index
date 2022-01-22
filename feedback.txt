@@ -1,0 +1,43 @@
+Project 1 - Inverted Index
+Kevin
+
+*** Autograder Tests: 9/9 ***
+
+Comments:
+
+-Program indentation is very messy, which appears to be the result of mixing tabs and spaces for indentation. It might look fine on your end; the problem with using both tabs and spaces is that tabs will not always display as the same number of spaces, so if someone (like me) opens the file in an editor with a different tab width configuration than you're using, the indentation will completely break.  Avoid this problem by picking either spaces or tabs for indentation and sticking to the choice 100% of the time.  You can also configure most editors to insert a certain number of spaces when you use the tab key (this is what I do).
+
+-Your word extraction logic is over-complicated, due to the fact that the standard word extraction provided by >> doesn't do what you want (it splits on whitespace, leading to filter etc). A simpler and cleaner design is to just iterate one character at a time and build up a word until you hit any non-alpha character, then start the next word. This would eliminate the entire filter function.
+
+-Your functions that are returning objects are returning *copies* of these objects (you make the first copy as a local variable inside the function, then make a copy of it when you return). To avoid this unnecessary copying of potentially large data structures, allocate it in the calling function and then use pass-by-reference, like so:
+
+Instead of this:
+
+	someBigThing setupThing() {
+		someBigThing thing; // local var
+		return thing; // makes a copy to return to caller
+	}
+
+	void caller() {
+		someBigThing myThing = setupThing();
+	}
+
+Do this:
+
+	void setupThing(someBigThing& thing) { // pass-by-reference
+		... // operate on thing
+	}
+
+	void caller() {
+		someBigThing myThing; // local var
+		setupThing(myThing); // no copy!
+	}
+
+-Similarly, because you are not using pass-by-reference in your function arguments, these are getting copied when you call the function.  Use & to avoid implicit copying (i.e., pass-by-value).  Check the section in the Project 1 writeup on reference variables.
+
+-Function comments are overly verbose. Partially this is due to extra words (eg complete sentences versus shorted phrases) but they also include unnecessary implementation details (e.g., "Uses functions readtext and filter").  E.g., see this tip from the style guide:  "Comments should not describe what the code does, but why. Novice coders (or those just starting in a new programming language) often make the mistake of documenting what the code is doing (e.g., "dereferences the pointer"). "  In the specific case of populate_map, you could boil down the whole comment block to something like "construct and return the inverted index from the given list of filenames".  Specific implementation details are always available in the code itself if the reader wants them.
+
+-When you have long lines split over multiple lines, double-indent the continuations (so it's clear that it's a continuation).
+
+
+Score: 90/100
